@@ -42,7 +42,7 @@ fontROM font
 // font ROM interface
 
 assign char_addr = {pixel_y [0],pixel_x [0]}; // forma el codigo del caracter
-assign row_addr = pixel_y [3:0]; // se utili los 3 4 bits menos significativos de y
+assign row_addr = pixel_y [3:0]; // se utili los 4 bits menos significativos de y
                                  // para recorrer las filas
 assign rom_addr = {char_addr , row_addr};
 assign bit_addr = pixel_x [2:0]; // se utilizan los 3 bits menos significativos de x
