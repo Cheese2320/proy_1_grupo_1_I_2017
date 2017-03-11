@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 02/26/2017 09:34:17 AM
+// Create Date: 28.02.2017 10:11:37
 // Design Name: 
-// Module Name: fontROM
+// Module Name: fontrom
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,10 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module fontROM( 
+module fontrom(
  input wire clk, // Reloj de entrada
- input wire [5:0] addr, // recorre todas las posibilidades de memoria 
- output reg [7:0]  data // 8 bits
+ input wire [5:0] addr, // recorre todas las posibilidades de memoria, recibe el valor de rom_addr, del módulo caracter
+ output reg [7:0]  data // 8 bits, recibe los bits almacenados en el espacio en memoria que se esta leyendo
 );
 
 reg [5:0] addr_reg; // Guarda la direccion actual
@@ -34,7 +34,8 @@ always @(posedge clk)
     always@*
         case (addr_reg) // Evalua el valor de la direccion
          //  NULL para completar los 64bits
-         6 'h00: data = 8'b00000000;
+         // espacio de memoria del fondo
+         6 'h00: data = 8'b00000000; 
          6 'h01: data = 8'b00000000;
          6 'h02: data = 8'b00000000;
          6 'h03: data = 8'b00000000;
@@ -50,7 +51,7 @@ always @(posedge clk)
          6 'h0d: data = 8'b00000000;
          6 'h0e: data = 8'b00000000;
          6 'h0f: data = 8'b00000000;
-         //  Primera letra I
+         //  Primera letra I, recuerde que hexa se agrupan los bits en grupos de 4. por eso 6'h10; quiere decir: número hexadecimal de 6 bits que es igual a 01 0000=10
          6 'h10: data = 8'b00000000;
          6 'h11: data = 8'b11111111;
          6 'h12: data = 8'b11111111;
@@ -67,7 +68,7 @@ always @(posedge clk)
          6 'h1d: data = 8'b11111111;
          6 'h1e: data = 8'b00000000;
          6 'h1f: data = 8'b00000000;
-         // Segunda letra S
+         // Segunda letra S; codigo de S 2=10
          6 'h20: data = 8'b00000000;
          6 'h21: data = 8'b11111111;
          6 'h22: data = 8'b11111111;
@@ -84,7 +85,7 @@ always @(posedge clk)
          6 'h2d: data = 8'b11111111;
          6 'h2e: data = 8'b00000000;
          6 'h2f: data = 8'b00000000;
-         // Tercera letra A
+         // Tercera letra A codigo de A 3=11
          6 'h30: data = 8'b00000000;
          6 'h31: data = 8'b00010000;
          6 'h32: data = 8'b00111000;
@@ -102,5 +103,4 @@ always @(posedge clk)
          6 'h3e: data = 8'b00000000;
          6 'h3f: data = 8'b00000000;   
 endcase
-endmodule
 endmodule

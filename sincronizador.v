@@ -22,8 +22,9 @@
 
 module sincronizador
 (
+//declaración de entradas y salidas
 input wire clk, rst,
-output hsync, vsync, vidon, divf,
+output hsync, vsync, vidon,
 output wire [9:0] px,py
 );
 
@@ -37,7 +38,7 @@ localparam vsu=33; //borde superior
 localparam vin=10; //borde inferior
 localparam vr=2; //retraso vertical
 
-//Divisor de frecuencia
+//Instaciamiento del módulo del divisor de frecuencia, el wire dv, toma el valor de la señal del reloj dividida, o sea, vale 25MHz
 wire dv;
 div div1(clk,rst,dv);
 
@@ -56,7 +57,7 @@ wire hfin, vfin;
 //Implementación de los registros
 always @(posedge clk, posedge rst)
     if (rst)//pone todo en cero al puro inicio
-        begin
+        begin //al momento de haber reset, todo se pone en cero.
             help<=0;
             hcr<=0;
             vcr<=0;
@@ -65,7 +66,7 @@ always @(posedge clk, posedge rst)
         end
     else
         begin//ciclo que se cumple después del reset
-            help<=~help;
+            help<=~help; //como dije más arriba, la variable me va ayudar a que los contadores realicen una única cuenta en cada enable (cada 25MHz)
             hcr<=hcn;
             vcr<=vcn;
             vsr<=vsn;
@@ -78,21 +79,22 @@ assign hfin=(hcr==(hd+hi+hde+hr-1));
 assign vfin=(vcr==(vd+vin+vsu+vr-1));
 //enables de los contadores
 always @*
-    if (dv&&help)
-        if (hfin)
+    if (dv&&help) //cada vez que esta activa la señal de 25MHz y help, el mop realiza lo siguiente
+        if (hfin) //si es el caso de que el contador horizontal ya realizó las 800 cuentas, se reinicia, o sea, termino de realizar una línea 
             hcn=0;
         else
-            hcn=hcr+1;
+            hcn=hcr+1; //para que cuente otro pixel
     else
-        hcn=hcr;
+        hcn=hcr;// para cuando no esta habilitado el dv, se mantiene la cuenta en el mismo número 
 always @*
-    if (dv && hfin&&help)
+    if (dv && hfin&&help) //Esto solo se realiza cuando se finaliza una lína, o sea, hfin==1, a parte de que dv y help deben de suceder
         if (vfin)
-            vcn=0;
+            vcn=0; // cuando terminar de contar 524 línea, se reinicia
         else
-            vcn=vcr+1;
+            vcn=vcr+1; // aumentar contado vertical 
     else
-        vcn=vcr;
+        vcn=vcr; //mantien contador vertical igual cuando no esta habilitado el dv o no se ha terminado una línea
+        
 // generar el retraso de de hsync
 assign hsn =~(hcr>=(hd+hde-1)&&hcr<(hd+hde+hr-1));
 // generar el retraso de de vsync 
@@ -107,5 +109,5 @@ assign hsync=hsr;
 assign vsync=vsr;
 assign px=hcr;
 assign py=vcr;
-assign divf=dv;
+
 endmodule
